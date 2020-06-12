@@ -1,0 +1,13 @@
+[Unit]
+Description=Spindown timeout for rotating disk %i
+After=suspend.target hibernate.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/hd-standby %i
+ExecStop=/usr/sbin/hd-standby %i 0
+
+[Install]
+WantedBy=basic.target suspend.target hibernate.target
+

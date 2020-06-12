@@ -1,0 +1,29 @@
+#! /bin/bash -eu
+
+# set rotational disks to spin down after a timeout
+
+DISK_NAME=${1:?disk name required}
+
+# default delay: 10 mins
+DELAY=${2:-120}
+
+function resolve_disk {
+    for devpath in "$1" "disk/by-id/$1" "disk/by-path/$1"; do
+        if [ -b "/dev/$devpath" ]; then
+            abspath=$(readlink -f "/dev/$devpath")
+            echo ${abspath#/dev/}
+            return
+        fi
+    done
+    echo "No disk named '$1' found" >/dev/stderr
+    return 1
+}
+
+DISK=$(resolve_disk "$DISK_NAME")
+
+if [ $(cat /sys/block/$DISK/queue/rotational) == 0 ]; then
+    echo "Not a rotating disk: $DISK" >/dev/stderr
+    exit 1
+fi
+
+hdparm -S $DELAY /dev/$DISK
