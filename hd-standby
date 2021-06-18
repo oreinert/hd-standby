@@ -15,14 +15,14 @@ function resolve_disk {
             return
         fi
     done
-    echo "No disk named '$1' found" >/dev/stderr
+    echo "No disk named '$1' found" >&2
     return 1
 }
 
 DISK=$(resolve_disk "$DISK_NAME")
 
 if [ $(cat /sys/block/$DISK/queue/rotational) == 0 ]; then
-    echo "Not a rotating disk: $DISK" >/dev/stderr
+    echo "Not a rotating disk: $DISK" >&2
     exit 1
 fi
 
